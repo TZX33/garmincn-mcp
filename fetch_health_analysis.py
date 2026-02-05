@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 from datetime import datetime, timedelta
 from mcp_server_garmincn.service.garmincn_service import GarminService
+from cache_manager import CacheManager, GarminDataFetcher
 import json
 
 def main():
@@ -39,7 +40,9 @@ def main():
     
     api = garmin_service.garminapi
     
-    # 获取最近7天+30天数据
+    # 创建带缓存的数据获取器
+    cache_manager = CacheManager()
+    fetcher = GarminDataFetcher(api, cache_manager)
     end_date = datetime.now()
     
     print(f"📅 分析日期: {end_date.strftime('%Y-%m-%d')}")
@@ -59,7 +62,7 @@ def main():
         date_str = date.strftime('%Y-%m-%d')
         
         try:
-            hr_data = api.get_heart_rates(date_str)
+            hr_data = fetcher.get_heart_rates(date_str)
             if hr_data:
                 resting_hr = hr_data.get('restingHeartRate')
                 max_hr = hr_data.get('maxHeartRate')
@@ -108,7 +111,7 @@ def main():
         date_str = date.strftime('%Y-%m-%d')
         
         try:
-            stress_data = api.get_stress_data(date_str)
+            stress_data = fetcher.get_stress_data(date_str)
             if stress_data:
                 avg_stress = stress_data.get('avgStressLevel')
                 max_stress = stress_data.get('maxStressLevel')
@@ -184,7 +187,7 @@ def main():
         date_str = date.strftime('%Y-%m-%d')
         
         try:
-            hrv_data = api.get_hrv_data(date_str)
+            hrv_data = fetcher.get_hrv_data(date_str)
             if hrv_data:
                 hrv_summary = hrv_data.get('hrvSummary', {})
                 weekly_avg = hrv_summary.get('weeklyAvg')
@@ -248,7 +251,7 @@ def main():
         date_str = date.strftime('%Y-%m-%d')
         
         try:
-            bb_data = api.get_body_battery(date_str)
+            bb_data = fetcher.get_body_battery(date_str)
             if bb_data:
                 # 获取当天的身体电量数据
                 for item in bb_data:
@@ -305,7 +308,7 @@ def main():
         date_str = date.strftime('%Y-%m-%d')
         
         try:
-            resp_data = api.get_respiration_data(date_str)
+            resp_data = fetcher.get_respiration_data(date_str)
             if resp_data:
                 avg_waking = resp_data.get('avgWakingRespirationValue')
                 avg_sleeping = resp_data.get('avgSleepingRespirationValue')
@@ -330,7 +333,7 @@ def main():
         date_str = date.strftime('%Y-%m-%d')
         
         try:
-            spo2_data = api.get_spo2_data(date_str)
+            spo2_data = fetcher.get_spo2_data(date_str)
             if spo2_data:
                 avg_spo2 = spo2_data.get('averageSpO2')
                 min_spo2 = spo2_data.get('lowestSpO2')
@@ -376,7 +379,7 @@ def main():
     
     today = end_date.strftime('%Y-%m-%d')
     try:
-        readiness = api.get_training_readiness(today)
+        readiness = fetcher.get_training_readiness(today)
         if readiness:
             score = readiness.get('score')
             level = readiness.get('level')
@@ -469,6 +472,9 @@ def main():
     print("\n" + "=" * 70)
     print("✅ 健康分析完成")
     print("=" * 70)
+    
+    # 打印缓存统计
+    fetcher.print_stats()
 
 if __name__ == "__main__":
     main()

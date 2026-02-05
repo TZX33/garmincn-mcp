@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 from datetime import datetime, timedelta
 from mcp_server_garmincn.service.garmincn_service import GarminService
+from cache_manager import CacheManager, GarminDataFetcher
 import json
 
 def format_duration(seconds):
@@ -67,6 +68,10 @@ def main():
     
     api = garmin_service.garminapi
     
+    # 创建带缓存的数据获取器
+    cache_manager = CacheManager()
+    fetcher = GarminDataFetcher(api, cache_manager)
+    
     # 获取最近30天的日期范围
     end_date = datetime.now()
     start_date = end_date - timedelta(days=30)
@@ -100,14 +105,15 @@ def main():
     print(f"   找到 {len(activities or [])} 个运动活动")
     
     # 获取30天睡眠数据
-    print("🔄 正在获取睡眠数据...")
+    print("🔄 正在获取睡眠数据 (使用本地缓存)...")
     
     for i in range(30):
         date = end_date - timedelta(days=i)
         date_str = date.strftime('%Y-%m-%d')
         
         try:
-            sleep_data = api.get_sleep_data(date_str)
+            # 使用缓存获取器：历史数据从本地读取，近期数据从 API 获取
+            sleep_data = fetcher.get_sleep_data(date_str)
             
             if sleep_data:
                 daily_info = sleep_data.get('dailySleepDTO', {})
@@ -559,6 +565,9 @@ def main():
     print("\n" + "=" * 70)
     print("✅ 分析完成")
     print("=" * 70)
+    
+    # 打印缓存统计
+    fetcher.print_stats()
 
 if __name__ == "__main__":
     main()
