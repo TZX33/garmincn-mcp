@@ -1,14 +1,22 @@
 [project]
-name = "mcp-server-garmincn"
-version = "0.1.0"
-description = "用于大模型的MCP服务，提供获取用户的佳明数据的tool"
+name = "garmin-coach"
+version = "0.2.0"
+description = "用于大模型的MCP服务，提供获取用户的佳明数据的tool，并带有本地数据库同步功能"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastmcp>=2.4.0",
     "garminconnect>=0.2.26",
-    "python-dotenv>=1.0.0",
+    "pydantic-settings>=2.7.0",
 ]
 
 [project.scripts]
-mcp-server-garmincn = "mcp_server_garmincn:main"
+garmin-coach = "garmin_coach.cli:main"
+mcp-server-garmincn = "garmin_coach.mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/garmin_coach"]

@@ -1,0 +1,32 @@
+name: Auto Sync Garmin Data
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # 每天凌晨 2 点 (UTC) 执行
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python & uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Run Garmin Sync
+        env:
+          GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+          IS_CN: ${{ secrets.IS_CN }}
+        run: |
+          uv sync
+          uv run garmin-coach sync
+          
+      # 如果需要，可以将数据回传到云存储或其他分支
+      # - name: Upload Database
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: garmin-db
+      #     path: data/garmin.db

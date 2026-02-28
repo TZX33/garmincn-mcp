@@ -105,6 +105,23 @@ wheels = [
 ]
 
 [[package]]
+name = "garmin-coach"
+version = "0.2.0"
+source = { editable = "." }
+dependencies = [
+    { name = "fastmcp" },
+    { name = "garminconnect" },
+    { name = "pydantic-settings" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastmcp", specifier = ">=2.4.0" },
+    { name = "garminconnect", specifier = ">=0.2.26" },
+    { name = "pydantic-settings", specifier = ">=2.7.0" },
+]
+
+[[package]]
 name = "garminconnect"
 version = "0.2.26"
 source = { registry = "https://pypi.org/simple" }
@@ -215,23 +232,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e7/bc/54aec2c334698cc575ca3b3481eed627125fb66544152fa1af927b1a495c/mcp-1.9.1.tar.gz", hash = "sha256:19879cd6dde3d763297617242888c2f695a95dfa854386a6a68676a646ce75e4", size = 316247, upload-time = "2025-05-22T15:52:21.26Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a6/c0/4ac795585a22a0a2d09cd2b1187b0252d2afcdebd01e10a68bbac4d34890/mcp-1.9.1-py3-none-any.whl", hash = "sha256:2900ded8ffafc3c8a7bfcfe8bc5204037e988e753ec398f371663e6a06ecd9a9", size = 130261, upload-time = "2025-05-22T15:52:19.702Z" },
-]
-
-[[package]]
-name = "mcp-server-garmincn"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "fastmcp" },
-    { name = "garminconnect" },
-    { name = "python-dotenv" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastmcp", specifier = ">=2.4.0" },
-    { name = "garminconnect", specifier = ">=0.2.26" },
-    { name = "python-dotenv", specifier = ">=1.0.0" },
 ]
 
 [[package]]
